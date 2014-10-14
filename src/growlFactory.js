@@ -200,6 +200,7 @@ angular.module("angular-growl").provider("growl", function() {
       };
 
       broadcastMessage(message);
+      return message;
     }
 
     /**
@@ -209,7 +210,7 @@ angular.module("angular-growl").provider("growl", function() {
      * @param {{ttl: number}} config
      */
     function warning(text, config) {
-      sendMessage(text, config, "warning");
+      return sendMessage(text, config, "warning");
     }
 
     /**
@@ -219,7 +220,7 @@ angular.module("angular-growl").provider("growl", function() {
      * @param {{ttl: number}} config
      */
     function error(text, config) {
-      sendMessage(text, config, "error");
+      return sendMessage(text, config, "error");
     }
 
     /**
@@ -229,7 +230,7 @@ angular.module("angular-growl").provider("growl", function() {
      * @param {{ttl: number}} config
      */
     function info(text, config) {
-      sendMessage(text, config, "info");
+      return sendMessage(text, config, "info");
     }
 
     /**
@@ -239,7 +240,15 @@ angular.module("angular-growl").provider("growl", function() {
      * @param {{ttl: number}} config
      */
     function success(text, config) {
-      sendMessage(text, config, "success");
+      return sendMessage(text, config, "success");
+    }
+
+    /**
+     *
+     * @param {Object} message
+     */
+    function deleteMessage(message){
+      $rootScope.$broadcast("deleteGrowlMessage", message);
     }
 
     /**
@@ -258,7 +267,7 @@ angular.module("angular-growl").provider("growl", function() {
           var config = {};
           config.variables = message[_messageVariableKey] || {};
           config.title = message[_messageTitleKey];
-          sendMessage(message[_messageTextKey], config, severity);
+          return sendMessage(message[_messageTextKey], config, severity);
         }
       }
     }
@@ -288,7 +297,8 @@ angular.module("angular-growl").provider("growl", function() {
       onlyUnique: onlyUnique,
       reverseOrder : reverseOrder,
       inlineMessages: inlineMessages,
-      position: position
+      position: position,
+      deleteMessage:deleteMessage
     };
   }];
 });
