@@ -1,7 +1,7 @@
 /**
- * angular-growl-v2 - v0.7.0 - 2014-08-10
- * http://janstevens.github.io/angular-growl-2
- * Copyright (c) 2014 Marco Rinck,Jan Stevens; Licensed MIT
+ * angular-growl-2-fork - v0.7.0 - 2014-10-14
+ * https://github.com/signal7/angular-growl-2
+ * Copyright (c) 2014 Signal7; Licensed MIT
  */
 angular.module('angular-growl', []);
 angular.module('angular-growl').directive('growl', [
@@ -86,6 +86,9 @@ angular.module('angular-growl').directive('growl', [
               $scope.messages.splice(index, 1);
             }
           };
+          $rootScope.$on('deleteGrowlMessage', function (event, message) {
+            $scope.deleteMessage(message);
+          });
           $scope.stopTimeoutClose = function (message) {
             angular.forEach(message.promises, function (promise) {
               $timeout.cancel(promise);
@@ -253,18 +256,22 @@ angular.module('angular-growl').provider('growl', function () {
           referenceId: _config.referenceId || _referenceId
         };
         broadcastMessage(message);
+        return message;
       }
       function warning(text, config) {
-        sendMessage(text, config, 'warning');
+        return sendMessage(text, config, 'warning');
       }
       function error(text, config) {
-        sendMessage(text, config, 'error');
+        return sendMessage(text, config, 'error');
       }
       function info(text, config) {
-        sendMessage(text, config, 'info');
+        return sendMessage(text, config, 'info');
       }
       function success(text, config) {
-        sendMessage(text, config, 'success');
+        return sendMessage(text, config, 'success');
+      }
+      function deleteMessage(message) {
+        $rootScope.$broadcast('deleteGrowlMessage', message);
       }
       function addServerMessages(messages) {
         var i, message, severity, length;
@@ -276,7 +283,7 @@ angular.module('angular-growl').provider('growl', function () {
             var config = {};
             config.variables = message[_messageVariableKey] || {};
             config.title = message[_messageTitleKey];
-            sendMessage(message[_messageTextKey], config, severity);
+            return sendMessage(message[_messageTextKey], config, severity);
           }
         }
       }
@@ -301,7 +308,8 @@ angular.module('angular-growl').provider('growl', function () {
         onlyUnique: onlyUnique,
         reverseOrder: reverseOrder,
         inlineMessages: inlineMessages,
-        position: position
+        position: position,
+        deleteMessage: deleteMessage
       };
     }
   ];
